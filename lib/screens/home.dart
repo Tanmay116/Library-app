@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:library_task/screens/home1.dart';
@@ -19,10 +17,12 @@ class _HomePageState extends State<HomePage> {
   String uid = (FirebaseAuth.instance.currentUser?.uid).toString();
   var bookslist = '';
   var favlist = '';
+
   bool TwoTales = false;
+  //List books = await retrieveFav(_dbref.child(Users/))
 
   @override
-  void initState() {
+  Future<void> initStbuildate() async {
     super.initState();
     _dbref = FirebaseDatabase(
             databaseURL:
@@ -31,8 +31,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Future<Widget> build(BuildContext context) async {
     String uid = (FirebaseAuth.instance.currentUser?.uid).toString();
+    List fav = await retrieveFav(_dbref.child('Users/$uid'));
+    int length = fav.length;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -74,40 +76,13 @@ class _HomePageState extends State<HomePage> {
         ),
         body: TabBarView(
           children: [
-            Column(
-              children: [
-                Center(
-                  child: Card(
-                    color: Colors.amber,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Container(
-                          height: 100,
-                          width: 100,
-                          child: Image.network(
-                              fit: BoxFit.scaleDown,
-                              'https://img.freepik.com/premium-photo/opened-book-bible-background_112554-164.jpg?w=360'),
-                        ),
-                        Text('$favlist', textScaleFactor: 1),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              TwoTales = true;
-                            });
-                            addData(_dbref.child('Users/$uid'), 'test1', true);
-                          },
-                          child: Text(
-                            'Add to favs',
-                          ),
-                          style:
-                              ElevatedButton.styleFrom(primary: Colors.brown),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            ListView.builder(
+              itemCount: 2,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: Text('$favlist'),
+                );
+              },
             ),
             // BookmarkPage
             Center(
@@ -144,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       )
                     : Text(
-                        'No Bookmarks',
+                        '$length',
                         style: TextStyle(fontSize: 30),
                       )),
             Column(

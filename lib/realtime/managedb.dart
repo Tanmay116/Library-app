@@ -11,6 +11,7 @@ void createDB(DatabaseReference _dbref) {
       'Wimpy Kid',
     ],
   };
+  
   _dbref.set(data);
 }
 
@@ -24,6 +25,7 @@ Future<List> retrieveFav(DatabaseReference _dbref) async {
   DatabaseEvent event = await _dbref.once();
   Map data = event.snapshot.value as Map;
   return (data['fav']);
+  
 }
 
 void addData(DatabaseReference _dbref, String newBook, bool isFav) async {
@@ -49,6 +51,7 @@ void addData(DatabaseReference _dbref, String newBook, bool isFav) async {
 void delData(DatabaseReference _dbref, String oldBook, bool isFav) async {
   DatabaseEvent event = await _dbref.once();
   Map data = event.snapshot.value as Map;
+  
   if (isFav) {
     List fav = data['fav'];
     fav = fav.toList();
