@@ -1,6 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:library_task/screens/home1.dart';
 import 'package:library_task/screens/signin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:library_task/realtime/managedb.dart';
@@ -17,22 +16,43 @@ class _HomePageState extends State<HomePage> {
   String uid = (FirebaseAuth.instance.currentUser?.uid).toString();
   var bookslist = '';
   var favlist = '';
+  late var fav;
+  int length = 0;
 
   bool TwoTales = true;
   //List books = await retrieveFav(_dbref.child(Users/))
 
   @override
-  Future<void> initStbuildate() async {
+  void initState() {
     super.initState();
+    print('hello');
     _dbref = FirebaseDatabase(
             databaseURL:
                 "https://library-task-default-rtdb.asia-southeast1.firebasedatabase.app/")
         .ref();
+    datafetch();
+  }
+
+  // void datafetch() async {
+  //   fav = await retrieveFav(_dbref.child('Users/$uid'));
+  //   print(fav);
+  //   setState(() {
+  //     length = fav.length;
+  //   });
+  // }
+
+  void datafetch() async {
+    fav = await retrieveFav(_dbref.child('Users/$uid'));
+    print(fav);
+    setState(() {
+      length = fav.length;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     String uid = (FirebaseAuth.instance.currentUser?.uid).toString();
+    //List fav = await retrieveFav(_dbref.child('Users/$uid'));
     // List fav = await retrieveFav(_dbref.child('Users/$uid'));
     // int length = fav.length;
     return DefaultTabController(
@@ -77,19 +97,10 @@ class _HomePageState extends State<HomePage> {
         body: TabBarView(
           children: [
             ListView.builder(
-              itemCount: 2,
+              itemCount: length,
               itemBuilder: (context, index) {
                 return Card(
-                  child: Text('$favlist'),
-                );
-              },
-            ),
-            // BookmarkPage
-            Center(
-                child: Column(
-              children: [
-                Card(
-                  color: Colors.red,
+                  color: Colors.brown,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -100,10 +111,46 @@ class _HomePageState extends State<HomePage> {
                             fit: BoxFit.scaleDown,
                             'https://img.freepik.com/premium-photo/opened-book-bible-background_112554-164.jpg?w=360'),
                       ),
-                      Text('$favlist'),
+                      Text(fav[index] ?? 0),
                       ElevatedButton(
                         child: Text("List Favs"),
                         onPressed: () async {
+                          addData(_dbref.child('Users/$uid'), 'test1', true);
+
+                          setState(() {
+                            datafetch();
+                            var stringList = fav.join(", ");
+                            fav = stringList;
+                          });
+                          print(fav.length);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            //BookmarkPage
+            ListView.builder(
+              itemCount: length,
+              itemBuilder: (context, index) {
+                return Card(
+                  color: Colors.brown,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        height: 100,
+                        width: 100,
+                        child: Image.network(
+                            fit: BoxFit.scaleDown,
+                            'https://img.freepik.com/premium-photo/opened-book-bible-background_112554-164.jpg?w=360'),
+                      ),
+                      Text(fav[index] ?? 0),
+                      ElevatedButton(
+                        child: Text("List Favs"),
+                        onPressed: () async {
+                          addData(_dbref.child('Users/$uid'), 'test1', true);
                           List fav =
                               await retrieveFav(_dbref.child('Users/$uid'));
                           var stringList = fav.join(", ");
@@ -113,9 +160,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                )
-              ],
-            )),
+                );
+              },
+            ),
+            //settings
             Column(
               children: [
                 Container(
@@ -145,4 +193,3 @@ class _HomePageState extends State<HomePage> {
   }
 }
 //dnsdbhwehjfgbdshbyegewfgdsigfgsefgdksjfhiefgisdghgbdisgfig
-
