@@ -18,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   var bookslist = '';
   var favlist = '';
 
-  bool TwoTales = false;
+  bool TwoTales = true;
   //List books = await retrieveFav(_dbref.child(Users/))
 
   @override
@@ -31,10 +31,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  Future<Widget> build(BuildContext context) async {
+  Widget build(BuildContext context) {
     String uid = (FirebaseAuth.instance.currentUser?.uid).toString();
-    List fav = await retrieveFav(_dbref.child('Users/$uid'));
-    int length = fav.length;
+    // List fav = await retrieveFav(_dbref.child('Users/$uid'));
+    // int length = fav.length;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -86,42 +86,36 @@ class _HomePageState extends State<HomePage> {
             ),
             // BookmarkPage
             Center(
-                child: TwoTales
-                    ? Column(
-                        children: [
-                          Center(
-                              child: Card(
-                            color: Colors.red,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Container(
-                                  height: 100,
-                                  width: 100,
-                                  child: Image.network(
-                                      fit: BoxFit.scaleDown,
-                                      'https://img.freepik.com/premium-photo/opened-book-bible-background_112554-164.jpg?w=360'),
-                                ),
-                                Text('$favlist'),
-                                ElevatedButton(
-                                  child: Text("Remove from Fav"),
-                                  onPressed: () {
-                                    setState(() {
-                                      TwoTales = false;
-                                    });
-                                    delData(_dbref.child('Users/$uid'), 'test1',
-                                        true);
-                                  },
-                                ),
-                              ],
-                            ),
-                          ))
-                        ],
-                      )
-                    : Text(
-                        '$length',
-                        style: TextStyle(fontSize: 30),
-                      )),
+                child: Column(
+              children: [
+                Card(
+                  color: Colors.red,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Container(
+                        height: 100,
+                        width: 100,
+                        child: Image.network(
+                            fit: BoxFit.scaleDown,
+                            'https://img.freepik.com/premium-photo/opened-book-bible-background_112554-164.jpg?w=360'),
+                      ),
+                      Text('$favlist'),
+                      ElevatedButton(
+                        child: Text("List Favs"),
+                        onPressed: () async {
+                          List fav =
+                              await retrieveFav(_dbref.child('Users/$uid'));
+                          var stringList = fav.join(", ");
+                          print(fav.length);
+                          setState(() => favlist = stringList);
+                        },
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            )),
             Column(
               children: [
                 Container(
