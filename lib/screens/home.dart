@@ -76,7 +76,12 @@ class _HomePageState extends State<HomePage> {
           title: Text('Library App CSI'),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: MySearchDelegate(),
+                );
+              },
               icon: Icon(Icons.search),
             ),
           ],
@@ -226,4 +231,61 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-//operations are 1 op late
+
+class MySearchDelegate extends SearchDelegate {
+  List<String> searchterms = ['apple', 'banana', 'orange', 'peach', 'lemon'];
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+      icon: const Icon(Icons.arrow_back_outlined),
+      onPressed: () {
+        close(context, null);
+      });
+
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+        IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              if (query.isEmpty) {
+                close(context, null);
+              } else {
+                query = '';
+              }
+            }),
+      ];
+
+  @override
+  Widget buildResults(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in searchterms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(title: Text(result),);
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<String> matchQuery = [];
+    for (var fruit in searchterms) {
+      if (fruit.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(fruit);
+      }
+    }
+    return ListView.builder(
+      itemCount: matchQuery.length,
+      itemBuilder: (context, index) {
+        var result = matchQuery[index];
+        return ListTile(title: Text(result),);
+      },
+    );
+  }
+}
+//all buttons working
