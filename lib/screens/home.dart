@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                           onPressed: fav.contains(book[index])
                               ? () {
                                   delData(_dbref.child('Users/$uid'),
-                                      fav[index], true);
+                                      book[index], true);
                                   setState(() {
                                     datafetch();
                                   });
