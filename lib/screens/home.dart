@@ -119,20 +119,30 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Text(book[index] ?? 0),
                       ElevatedButton(
-                        child: Text("Add Book"),
-                        onPressed: () {
-                          addData(
-                              _dbref.child('Users/$uid'), book[index], false);
-                          setState(() {
-                            datafetchbook();
+                          child: fav.contains(book[index])
+                              ? Icon(Icons.bookmark_add)
+                              : Icon(Icons.bookmark_add_outlined),
+                          onPressed: fav.contains(book[index])
+                              ? () {
+                                  delData(_dbref.child('Users/$uid'),
+                                      fav[index], true);
+                                  setState(() {
+                                    datafetch();
+                                  });
+                                  print(fav.length);
+                                }
+                              : () {
+                                  addData(_dbref.child('Users/$uid'),
+                                      book[index], true);
+                                  setState(() {
+                                    datafetchbook();
 
-                            var stringList_book = book.join(", ");
-                            book = stringList_book;
-                          });
+                                    var stringList_book = book.join(", ");
+                                    book = stringList_book;
+                                  });
 
-                          print(book.length);
-                        },
-                      ),
+                                  print(book.length);
+                                }),
                       ElevatedButton(
                         child: Text("Remove Book"),
                         onPressed: () {
@@ -160,18 +170,18 @@ class _HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(fav[index] ?? 0),
-                      ElevatedButton(
-                        child: Text("Add Favs"),
-                        onPressed: () {
-                          addData(_dbref.child('Users/$uid'), fav[index], true);
-                          setState(() {
-                            datafetch();
-                            var stringList_fav = fav.join(", ");
-                            fav = stringList_fav;
-                          });
-                          print(fav.length);
-                        },
-                      ),
+                      // ElevatedButton(
+                      //   child: Text("Add Favs"),
+                      //   onPressed: () {
+                      //     addData(_dbref.child('Users/$uid'), fav[index], true);
+                      //     setState(() {
+                      //       datafetch();
+                      //       var stringList_fav = fav.join(", ");
+                      //       fav = stringList_fav;
+                      //     });
+                      //     print(fav.length);
+                      //   },
+                      // ),
                       ElevatedButton(
                         child: Text("Remove Fav"),
                         onPressed: () {
