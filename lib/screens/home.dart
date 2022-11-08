@@ -17,7 +17,9 @@ class _HomePageState extends State<HomePage> {
   var bookslist = '';
   var favlist = '';
   late var fav;
-  int length = 0;
+  var book;
+  var length_fav = 0;
+  var length_book = 0;
 
   bool TwoTales = true;
   //List books = await retrieveFav(_dbref.child(Users/))
@@ -31,21 +33,22 @@ class _HomePageState extends State<HomePage> {
                 "https://library-task-default-rtdb.asia-southeast1.firebasedatabase.app/")
         .ref();
     datafetch();
+    datafetchbook();
   }
 
-  // void datafetch() async {
-  //   fav = await retrieveFav(_dbref.child('Users/$uid'));
-  //   print(fav);
-  //   setState(() {
-  //     length = fav.length;
-  //   });
-  // }
+  void datafetchbook() async {
+    book = await retrieveBooks(_dbref.child('Users/$uid'));
+    print(book);
+    setState(() {
+      length_book = book.length;
+    });
+  }
 
   void datafetch() async {
     fav = await retrieveFav(_dbref.child('Users/$uid'));
     print(fav);
     setState(() {
-      length = fav.length;
+      length_fav = fav.length;
     });
   }
 
@@ -58,6 +61,16 @@ class _HomePageState extends State<HomePage> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.refresh),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),
+              (Route<dynamic> route) => false,
+            );
+          },
+        ),
         backgroundColor: Color.fromARGB(255, 180, 149, 139),
         appBar: AppBar(
           title: Text('Library App CSI'),
@@ -97,34 +110,41 @@ class _HomePageState extends State<HomePage> {
         body: TabBarView(
           children: [
             ListView.builder(
-              itemCount: length,
+              itemCount: length_book,
               itemBuilder: (context, index) {
                 return Card(
                   color: Colors.brown,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Container(
-                        height: 100,
-                        width: 100,
-                        child: Image.network(
-                            fit: BoxFit.scaleDown,
-                            'https://img.freepik.com/premium-photo/opened-book-bible-background_112554-164.jpg?w=360'),
-                      ),
-                      Text(fav[index] ?? 0),
+                      Text(book[index] ?? 0),
                       ElevatedButton(
-                        child: Text("List Favs"),
-                        onPressed: () async {
-                          addData(_dbref.child('Users/$uid'), 'test1', true);
-
+                        child: Text("Add Book"),
+                        onPressed: () {
+                          addData(
+                              _dbref.child('Users/$uid'), book[index], false);
                           setState(() {
-                            datafetch();
-                            var stringList = fav.join(", ");
-                            fav = stringList;
+                            datafetchbook();
+
+                            var stringList_book = book.join(", ");
+                            book = stringList_book;
                           });
-                          print(fav.length);
+
+                          print(book.length);
                         },
                       ),
+                      ElevatedButton(
+                        child: Text("Remove Book"),
+                        onPressed: () {
+                          delData(
+                              _dbref.child('Users/$uid'), book[index], false);
+                          setState(() {
+                            datafetchbook();
+                          });
+
+                          print(book.length);
+                        },
+                      )
                     ],
                   ),
                 );
@@ -132,32 +152,36 @@ class _HomePageState extends State<HomePage> {
             ),
             //BookmarkPage
             ListView.builder(
-              itemCount: length,
+              itemCount: length_fav,
               itemBuilder: (context, index) {
                 return Card(
                   color: Colors.brown,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Container(
-                        height: 100,
-                        width: 100,
-                        child: Image.network(
-                            fit: BoxFit.scaleDown,
-                            'https://img.freepik.com/premium-photo/opened-book-bible-background_112554-164.jpg?w=360'),
-                      ),
                       Text(fav[index] ?? 0),
                       ElevatedButton(
-                        child: Text("List Favs"),
-                        onPressed: () async {
-                          addData(_dbref.child('Users/$uid'), 'test1', true);
-                          List fav =
-                              await retrieveFav(_dbref.child('Users/$uid'));
-                          var stringList = fav.join(", ");
+                        child: Text("Add Favs"),
+                        onPressed: () {
+                          addData(_dbref.child('Users/$uid'), fav[index], true);
+                          setState(() {
+                            datafetch();
+                            var stringList_fav = fav.join(", ");
+                            fav = stringList_fav;
+                          });
                           print(fav.length);
-                          setState(() => favlist = stringList);
                         },
                       ),
+                      ElevatedButton(
+                        child: Text("Remove Fav"),
+                        onPressed: () {
+                          delData(_dbref.child('Users/$uid'), fav[index], true);
+                          setState(() {
+                            datafetch();
+                          });
+                          print(fav.length);
+                        },
+                      )
                     ],
                   ),
                 );
@@ -192,4 +216,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-//dnsdbhwehjfgbdshbyegewfgdsigfgsefgdksjfhiefgisdghgbdisgfig
+//operations are 1 op late
